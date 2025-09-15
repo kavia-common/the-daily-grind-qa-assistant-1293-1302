@@ -1,104 +1,269 @@
-/* CSS Variables for Theme Management */
+/* The Daily Grind - Coffee Shop Theme */
+
+/* Theme variables */
 :root {
-  /* Light theme colors */
-  --bg-primary: #ffffff;
-  --bg-secondary: #f8f9fa;
-  --text-primary: #282c34;
-  --text-secondary: #61dafb;
-  --border-color: #e9ecef;
-  --button-bg: #007bff;
-  --button-text: #ffffff;
+  --coffee-cream: #f9f4ef;
+  --coffee-milk: #f2e9e4;
+  --coffee-bean: #4a2c2a;
+  --coffee-brown: #7b4b3a;
+  --coffee-caramel: #c08a58;
+  --coffee-foam: #fff8f0;
+
+  --bg: var(--coffee-cream);
+  --bg-card: #ffffff;
+  --text: #2b2b2b;
+  --subtle: #6b6b6b;
+  --border: #ece6e2;
+
+  --bubble-user: #e6f4ea;
+  --bubble-bot: #fff3e6;
+
+  --btn-bg: var(--coffee-brown);
+  --btn-bg-hover: #6e4436;
+  --btn-text: #ffffff;
+
+  --shadow: 0 8px 20px rgba(0,0,0,0.08);
 }
 
 [data-theme="dark"] {
-  /* Dark theme colors */
-  --bg-primary: #1a1a1a;
-  --bg-secondary: #282c34;
-  --text-primary: #ffffff;
-  --text-secondary: #61dafb;
-  --border-color: #404040;
-  --button-bg: #0056b3;
-  --button-text: #ffffff;
+  --bg: #1a1716;
+  --bg-card: #221f1e;
+  --text: #f5f5f5;
+  --subtle: #cfcfcf;
+  --border: #3a3331;
+
+  --bubble-user: #22362a;
+  --bubble-bot: #2e2620;
+
+  --btn-bg: #c08a58;
+  --btn-bg-hover: #b17845;
+  --btn-text: #1a1716;
+
+  --shadow: 0 8px 22px rgba(0,0,0,0.35);
 }
 
-.App {
-  text-align: center;
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
+/* Base layout */
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", sans-serif;
+}
+
+/* App shell */
+.app-shell {
   min-height: 100vh;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+/* Header */
+.dg-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 20px;
+  background: linear-gradient(180deg, rgba(192,138,88,0.17), transparent),
+    var(--bg);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  backdrop-filter: blur(6px);
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
-.App-header {
-  background-color: var(--bg-secondary);
-  min-height: 100vh;
+.brand-icon {
+  font-size: 28px;
+  line-height: 1;
+}
+
+.brand-text {
   display: flex;
   flex-direction: column;
+}
+
+.brand-title {
+  margin: 0;
+  font-size: 20px;
+  letter-spacing: 0.3px;
+  color: var(--coffee-brown);
+}
+
+[data-theme="dark"] .brand-title {
+  color: var(--coffee-caramel);
+}
+
+.brand-subtitle {
+  margin: 0;
+  font-size: 12px;
+  color: var(--subtle);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Main */
+.dg-main {
+  display: grid;
+  place-items: center;
+  padding: 24px 16px;
+}
+
+.chat-card {
+  width: 100%;
+  max-width: 860px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  padding: 16px;
+}
+
+/* Messages area */
+.chat-messages {
+  height: min(56vh, 520px);
+  overflow: auto;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  scroll-behavior: smooth;
+  background: linear-gradient(180deg, var(--coffee-foam), transparent 160px);
+  border-radius: 12px;
+}
+
+[data-theme="dark"] .chat-messages {
+  background: linear-gradient(180deg, rgba(255,255,255,0.03), transparent 160px);
+}
+
+/* Bubbles */
+.bubble-row {
+  display: flex;
+  width: 100%;
+}
+
+.bubble-row.left {
+  justify-content: flex-start;
+}
+
+.bubble-row.right {
+  justify-content: flex-end;
+}
+
+.bubble {
+  max-width: 78%;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  font-size: 15px;
+  line-height: 1.4;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.bubble.user {
+  background: var(--bubble-user);
+}
+
+.bubble.bot {
+  background: var(--bubble-bot);
+}
+
+.dots {
+  letter-spacing: 2px;
+  color: var(--subtle);
+}
+
+/* Input area */
+.chat-input {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text);
+  border-radius: 10px;
+  font-size: 15px;
+  outline: none;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.input:focus {
+  border-color: var(--coffee-caramel);
+  box-shadow: 0 0 0 4px rgba(192, 138, 88, 0.18);
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: var(--text-primary);
-  transition: background-color 0.3s ease;
-  position: relative;
-}
-
-.App-link {
-  color: var(--text-secondary);
-  transition: color 0.3s ease;
-}
-
-.theme-toggle {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  background-color: var(--button-bg);
-  color: var(--button-text);
-  border: none;
-  border-radius: 8px;
-  padding: 10px 20px;
-  font-size: 14px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: var(--btn-bg);
+  color: var(--btn-text);
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.06s ease, box-shadow 0.2s ease, background 0.2s ease;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.12);
 }
 
-.theme-toggle:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-  opacity: 0.9;
+.btn:active {
+  transform: translateY(1px);
 }
 
-.theme-toggle:active {
-  transform: translateY(0);
+.btn:hover {
+  background: var(--btn-bg-hover);
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.theme-btn {
+  min-width: 96px;
 }
 
-/* Responsive design for mobile */
-@media (max-width: 768px) {
-  .theme-toggle {
-    top: 10px;
-    right: 10px;
-    padding: 8px 16px;
-    font-size: 12px;
-  }
+.submit-btn {
+  min-width: 96px;
+}
+
+/* Helper text */
+.helper-text {
+  margin: 8px 2px 2px;
+  font-size: 12px;
+  color: var(--subtle);
+}
+
+/* Footer */
+.dg-footer {
+  padding: 18px;
+  text-align: center;
+  color: var(--subtle);
+  border-top: 1px solid var(--border);
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .bubble { max-width: 88%; }
+  .brand-title { font-size: 18px; }
 }

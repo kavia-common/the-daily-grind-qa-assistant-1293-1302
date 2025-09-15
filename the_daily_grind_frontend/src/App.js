@@ -45,8 +45,23 @@ export default function App() {
      * Sends the user's question to the backend and returns the answer text.
      * Uses REACT_APP_API_BASE or defaults to '' (same origin).
      * Expects a JSON response: { answer: '...' }
+     *
+     * If REACT_APP_API_BASE is set:
+     * - If it's an absolute URL, use it directly as prefix.
+     * - Otherwise, treat it as a path prefix.
+     * Ensures we don't end up with double slashes.
      */
-    const base = process.env.REACT_APP_API_BASE || '';
+    const rawBase = process.env.REACT_APP_API_BASE || '';
+    let base = rawBase.trim();
+
+    // Normalize base
+    if (base === '/') {
+      base = '';
+    }
+    if (base.endsWith('/')) {
+      base = base.slice(0, -1);
+    }
+
     const url = `${base}/api/ask`;
 
     const response = await fetch(url, {

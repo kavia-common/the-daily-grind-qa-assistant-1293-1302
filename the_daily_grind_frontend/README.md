@@ -16,8 +16,11 @@ In the project directory:
 
 - `npm install`
 - Configure environment (optional):
-  - Copy `.env.example` to `.env` and set `REACT_APP_API_BASE` if your API is hosted on a different origin.
+  - Copy `.env.example` to `.env` and set `REACT_APP_API_BASE` if your API is hosted on a different origin (e.g. `https://api.example.com`).
   - If left empty, requests will be made to same-origin `/api/ask`.
+  - For local development, ensure the React dev server proxies API calls to your backend:
+    - We configure `"proxy": "http://localhost:5000"` in `package.json` by default. Adjust this to your backend dev URL or remove if not needed.
+    - With the proxy in place and no `REACT_APP_API_BASE`, requests to `/api/ask` will be forwarded to your backend (e.g., `http://localhost:5000/api/ask`).
 - `npm start`
 
 Then open http://localhost:3000 to view it in the browser.

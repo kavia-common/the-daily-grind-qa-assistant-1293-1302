@@ -5,24 +5,30 @@ Customer-facing web interface for submitting questions and viewing answers from 
 ## Features
 
 - Input form to submit customer questions
-- Display area for responses (mocked locally)
+- Display area for responses (from backend API)
 - Coffee shop–themed, friendly UI
 - Light/Dark theme toggle
-- Fully client-side, React 18
+- React 18
 
 ## Getting Started
 
 In the project directory:
 
 - `npm install`
+- Configure environment (optional):
+  - Copy `.env.example` to `.env` and set `REACT_APP_API_BASE` if your API is hosted on a different origin.
+  - If left empty, requests will be made to same-origin `/api/ask`.
 - `npm start`
 
 Then open http://localhost:3000 to view it in the browser.
 
-## Notes
+## API
 
-- All answers are mocked locally for now; no backend integration required in this step.
-- You can toggle the light/dark theme using the header button.
+- Endpoint: `POST /api/ask`
+- Request body: `{ "question": "string" }`
+- Response body: `{ "answer": "string" }`
+
+Set `REACT_APP_API_BASE` to prefix the API, e.g., `https://api.example.com` so the final URL becomes `https://api.example.com/api/ask`.
 
 ## Testing
 
@@ -30,4 +36,8 @@ Then open http://localhost:3000 to view it in the browser.
 
 The test verifies:
 - Greeting renders
-- Submitting “What are your hours?” produces a known hours response
+- Submitting “What are your hours?” eventually shows a bot response (dependent on backend behavior)
+
+## Notes
+
+- You can toggle the light/dark theme using the header button.

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './App.css';
 
 // PUBLIC_INTERFACE
@@ -6,8 +6,8 @@ export default function App() {
   /**
    * The Daily Grind - Customer Q&A
    * - Single page with a friendly, coffee-themed design
-   * - Customers can type a question and receive a mock answer
-   * - Local state only; no backend integration required at this stage
+   * - Customers can type a question and receive an answer from backend API
+   * - Implements loading and error states
    */
 
   // UI state
@@ -39,42 +39,45 @@ export default function App() {
     setTheme((t) => (t === 'light' ? 'dark' : 'light'));
   };
 
-  // Simulated "mock" answer generator
-  const mockResponder = useMemo(() => {
-    const canned = [
-      "Great choice! Our house blend features chocolate and caramel notes. Would you like it hot or iced?",
-      "We're open from 7am to 6pm on weekdays, and 8am to 4pm on weekends.",
-      "Our current special is the Maple Oat Latte — slightly sweet, super cozy!",
-      "We offer whole milk, oat, almond, and soy. Oat milk pairs wonderfully with espresso.",
-      "Yes! We have fresh pastries delivered every morning from a local bakery.",
-      "We can make almost any drink iced. Just ask! Our cold brew is also a fan favorite.",
-      "For a nutty taste, try our hazelnut latte or a cortado for a balanced espresso-forward drink.",
-      "You can order ahead using our website or by calling the shop—your drink will be ready when you arrive.",
-    ];
+  // PUBLIC_INTERFACE
+  async function askBackend(questionText) {
+    /**
+     * Sends the user's question to the backend and returns the answer text.
+     * Uses REACT_APP_API_BASE or defaults to '' (same origin).
+     * Expects a JSON response: { answer: '...' }
+     */
+    const base = process.env.REACT_APP_API_BASE || '';
+    const url = `${base}/api/ask`;
 
-    const keywords = [
-      { key: ['hour', 'open', 'close', 'time'], msg: "We're open from 7am to 6pm on weekdays, and 8am to 4pm on weekends." },
-      { key: ['milk', 'oat', 'almond', 'dairy'], msg: "We offer whole milk, oat, almond, and soy. Oat milk pairs wonderfully with espresso." },
-      { key: ['special', 'seasonal', 'feature'], msg: "Our current special is the Maple Oat Latte — slightly sweet, super cozy!" },
-      { key: ['cold', 'iced', 'ice'], msg: "We can make almost any drink iced. Our cold brew is bold, smooth, and very popular." },
-      { key: ['pastry', 'muffin', 'bagel', 'croissant', 'food'], msg: "Yes! We have fresh pastries delivered every morning from a local bakery." },
-      { key: ['order', 'ahead', 'online', 'pickup'], msg: "You can order ahead online or by phone — we’ll have it ready when you arrive!" },
-      { key: ['recommend', 'suggest', 'favorite', 'favourite'], msg: "If you enjoy balanced flavors, try a cappuccino. For something cozy, the vanilla latte is wonderful." },
-      { key: ['bean', 'blend', 'roast', 'origin'], msg: "Our beans are medium-roasted with notes of chocolate and caramel, sourced from small farms." },
-    ];
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      // You may add auth headers here if needed in the future.
+      body: JSON.stringify({ question: questionText }),
+    });
 
-    // PUBLIC_INTERFACE
-    return (q) => {
-      const lower = (q || '').toLowerCase();
-      for (const item of keywords) {
-        if (item.key.some((k) => lower.includes(k))) {
-          return item.msg;
-        }
+    if (!response.ok) {
+      // Try to extract error info if provided
+      let details = '';
+      try {
+        const errJson = await response.json();
+        details = errJson?.error || errJson?.message || '';
+      } catch {
+        // ignore JSON parse errors
       }
-      // Fallback randomized helpful response
-      return canned[Math.floor(Math.random() * canned.length)];
-    };
-  }, []);
+      const msg = details ? `${response.status} ${response.statusText}: ${details}` : `${response.status} ${response.statusText}`;
+      throw new Error(msg);
+    }
+
+    const data = await response.json();
+    // Defensive: ensure shape
+    if (!data || typeof data.answer !== 'string') {
+      throw new Error('Invalid response from server: missing "answer" field.');
+    }
+    return data.answer;
+  }
 
   // PUBLIC_INTERFACE
   const handleSubmit = async (e) => {
@@ -96,21 +99,30 @@ export default function App() {
     setQuestion('');
     setIsSubmitting(true);
 
-    // Simulate API delay
-    await new Promise((r) => setTimeout(r, 650));
-
-    const answerText = mockResponder(trimmed);
-    const botMsg = {
-      id: `b-${Date.now()}`,
-      type: 'bot',
-      text: answerText,
-      timestamp: Date.now(),
-    };
-    setMessages((prev) => [...prev, botMsg]);
-    setIsSubmitting(false);
-
-    // Focus input for quick follow-up
-    inputRef.current?.focus();
+    try {
+      const answerText = await askBackend(trimmed);
+      const botMsg = {
+        id: `b-${Date.now()}`,
+        type: 'bot',
+        text: answerText,
+        timestamp: Date.now(),
+      };
+      setMessages((prev) => [...prev, botMsg]);
+    } catch (err) {
+      // Show a friendly error bubble
+      const botMsg = {
+        id: `b-${Date.now()}`,
+        type: 'bot',
+        text:
+          `Oops! I couldn't fetch an answer right now. Please try again in a moment. (${err?.message || 'Network error'})`,
+        timestamp: Date.now(),
+      };
+      setMessages((prev) => [...prev, botMsg]);
+    } finally {
+      setIsSubmitting(false);
+      // Focus input for quick follow-up
+      inputRef.current?.focus();
+    }
   };
 
   return (

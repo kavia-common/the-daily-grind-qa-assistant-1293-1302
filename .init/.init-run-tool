@@ -1,0 +1,4 @@
+{
+    "command": "PORT=<port> HOST=<host> BROWSER=none npm start",
+    "working_directory": "/home/kavia/workspace/code-generation/the-daily-grind-qa-assistant-1293-1302/the_daily_grind_frontend"
+}
